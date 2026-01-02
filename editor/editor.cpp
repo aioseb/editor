@@ -1,0 +1,123 @@
+﻿#include "pch.h"
+#include "input_controller.h"
+#include "render_controller.h"
+#include "camera_controller.h"
+#include "render_view.h"
+#include "state.h"
+#include "config.h"
+
+#define _USE_MATH_DEFINES
+#include <math.h>
+
+int main() {
+	// Initialize render state and window
+	initializeRenderState();
+
+	// Define the mesh for a cube
+	Vec4 verticesCube[8] = {
+		{ 0.5,  0.5,  0.5},	// 0 //	  3 ------ 0
+		{ 0.5,  0.5, -0.5},	// 1 //	 /┆       /|
+		{-0.5,  0.5, -0.5},	// 2 //	2 ------ 1 |
+		{-0.5,  0.5,  0.5},	// 3 // | ┆		 | |
+		{ 0.5, -0.5,  0.5},	// 4 // | 7 ------ 4
+		{ 0.5, -0.5, -0.5},	// 5 // |/       |/
+		{-0.5, -0.5, -0.5},	// 6 // 6 ------ 5 
+		{-0.5, -0.5,  0.5},	// 7 //
+	};
+
+	Face facesCube[12] = {
+		{0, 1, 2},
+		{0, 3, 2},
+		{4, 5, 6},
+		{4, 7, 6},
+		{0, 1, 5},
+		{0, 4, 5},
+		{3, 2, 6},
+		{3, 7, 6},
+		{3, 0, 4},
+		{3, 7, 4},
+		{2, 1, 5},
+		{2, 6, 5}
+	};
+
+	// Define the mesh for a pyramid
+	Vec4 verticesPyramid[5] = {
+		{ 0.0,  0.5,  0.0},	// 0 //			0 \			 /
+		{ 0.5, -0.5,  0.5}, // 1 //		   / \ 	\		/
+		{ 0.5, -0.5, -0.5}, // 2 //       /4 -\-- 1    /
+		{-0.5, -0.5, -0.5}, // 3 //      //    \ /    /
+		{-0.5, -0.5,  0.5}  // 4 //     3 ----- 2    /
+	};
+
+	Face facesPyramid[6] = {
+		{1, 2, 3},
+		{1, 4, 3},
+		{0, 2, 1},
+		{0, 2, 3},
+		{0, 3, 4},
+		{0, 4, 1}
+	};
+
+	const float RADIUS = 3.0f;
+	const float SCALE = 2.0f;
+	const float PI = 3.141592f;
+	const float DELTA = 0.5f * PI;
+
+	float angle = 0.0f;
+
+	// Create cube mesh
+	Mesh cubeOne = createMesh(verticesCube, 8, facesCube, 12);
+
+	// Scale second cube along the X and Y axis
+	Mesh cubeTwo = createMesh(verticesCube, 8, facesCube, 12, worldRight * RADIUS, zeroVector, (worldRight + worldUp) * SCALE + worldForward);
+
+	// Creade pyramid mesh
+	Mesh pyramid = createMesh(verticesPyramid, 5, facesPyramid, 6);
+	setTranslation(pyramid, worldUp * 1.0f);
+
+	sf::Clock clock;
+
+	while (screenConfig.window.isOpen()) {
+		timeState.deltaTime = clock.restart().asSeconds();
+
+		while (const std::optional event = screenConfig.window.pollEvent()) {
+			if (event->is<sf::Event::Closed>()) {
+				screenConfig.window.close();
+			}
+		}
+
+		// Draw frist cube in 3D space and rotate it
+		drawMesh(cubeOne);
+		rotateBy(cubeOne, worldUp * DELTA * timeState.deltaTime);
+
+		// Draw second cube in 3D space and move it in circular motion
+		drawMesh(cubeTwo);
+
+		float s = RADIUS * sin(angle);
+		float c = RADIUS * cos(angle);
+		setTranslation(cubeTwo, worldRight * c + worldUp * s);
+		rotateBy(cubeTwo, worldForward * DELTA * timeState.deltaTime);
+
+		// Modify one of the pyarmid's vertices (the tip)
+		// NOTE: Modifiyng vertices won't be this 'hacky'
+		// TODO: Find a better way to implement vertex modification / update
+
+		pyramid.vertices[0].y = RADIUS * sin(angle + PI * 0.5f) * 0.5f;
+		pyramid.vertices[0].x = RADIUS * cos(angle + PI * 0.5f) * 1.5f;
+		drawMesh(pyramid);
+
+		// Draw world axis in the center of the screen
+		if (renderConfig.drawAxisEnabled) {
+			drawAxis();
+		}
+
+		// Act upon mouse or keyboard press
+		handleInputs();
+
+		angle += DELTA * timeState.deltaTime;
+		if (angle > PI * 2) angle = 0.0f;
+
+		screenConfig.window.display();
+		screenConfig.window.clear();
+	}
+}
