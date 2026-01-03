@@ -58,6 +58,17 @@ int main() {
 		{0, 4, 1}
 	};
 
+	// Define the mesh for a triangle
+	Vec4 verticesTriangle[3] = {
+		{  0.0f, 0.5f, 0.0f},
+		{  0.0f, 0.0f, 0.5f},
+		{ -0.5f, 0.0f, 0.0f}
+	};
+
+	Face facesTriangle[1] = {
+		{0, 1, 2}
+	};
+
 	const float RADIUS = 3.0f;
 	const float SCALE = 2.0f;
 	const float PI = 3.141592f;
@@ -75,6 +86,10 @@ int main() {
 	Mesh pyramid = createMesh(verticesPyramid, 5, facesPyramid, 6);
 	setTranslation(pyramid, worldUp * 1.0f);
 
+	// Create triangle mesh
+	Mesh triangle = createMesh(verticesTriangle, 3, facesTriangle, 1);
+	setTranslation(triangle, worldRight * 4.0f);
+
 	sf::Clock clock;
 
 	while (screenConfig.window.isOpen()) {
@@ -85,6 +100,9 @@ int main() {
 				screenConfig.window.close();
 			}
 		}
+
+		// Draw triangle
+		drawMesh(triangle);
 
 		// Draw frist cube in 3D space and rotate it
 		drawMesh(cubeOne);

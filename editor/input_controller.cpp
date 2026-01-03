@@ -22,8 +22,13 @@ void handleKeyboardInput() {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
 		cameraShift(worldUp * -units);
 	}
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X)) {
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X) && !renderConfig.hasBeenToggled) {
 		renderConfig.drawAxisEnabled = !renderConfig.drawAxisEnabled;
+		renderConfig.hasBeenToggled = true;
+	}
+	else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X)) {
+		renderConfig.hasBeenToggled = false;
 	}
 }
 
@@ -38,8 +43,8 @@ void handleMouseInput() {
 	int offsetY = my - mouseState.y;
 
 	// Apply sensitivity
-	cameraState.camAngle.y += offsetX * movementConfig.sensitivity * 0.01f; // yaw
-	cameraState.camAngle.x += offsetY * movementConfig.sensitivity * 0.01f; // pitch
+	cameraState.camAngle.y += offsetX * movementConfig.sensitivity * timeState.deltaTime; // yaw
+	cameraState.camAngle.x += offsetY * movementConfig.sensitivity * timeState.deltaTime; // pitch
 
 	// Clamp pitch (prevent flipping)
 	if (cameraState.camAngle.x > 1.5f) cameraState.camAngle.x = 1.5f;

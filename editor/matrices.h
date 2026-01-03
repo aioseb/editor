@@ -60,6 +60,14 @@ constexpr Vec3 worldRight = { 1.0f, 0.0f, 0.0f };
 constexpr Vec3 worldUp = { 0.0f, 1.0f, 0.0f };
 constexpr Vec3 worldForward = { 0.0f, 0.0f, 1.0f };
 
+constexpr Vec4 rightPlane = { 1.0f, 0.0f, 0.0f, 1.0f };
+constexpr Vec4 leftPlane = { -1.0f, 0.0f, 0.0f, 1.0f };
+constexpr Vec4 topPlane = { 0.0f, 1.0f, 0.0f, 1.0f };
+constexpr Vec4 bottomPlane = { 0.0f, -1.0f, 0.0f, 1.0f };
+constexpr Vec4 farPlane = { 0.0f, 0.0f, 1.0f, 1.0f };
+constexpr Vec4 nearPlane = { 0.0f, 0.0f, -1.0f, 1.0f };
+constexpr Vec4 planes[6] = { rightPlane, leftPlane, topPlane, bottomPlane, farPlane, nearPlane };
+
 // -------------------------------------------------------------------------------------
 // --------------------------------- VECTOR OPERATIONS ---------------------------------
 // -------------------------------------------------------------------------------------
@@ -67,6 +75,9 @@ constexpr Vec3 worldForward = { 0.0f, 0.0f, 1.0f };
 float magnitude(const Vec3& v);
 Vec3 normalize(const Vec3& v);
 Vec3 cross(const Vec3& v, const Vec3& u);
+Vec4 intersection(const Vec4& v, const Vec4& u, const Vec4& plane);
+bool insidePlane(const Vec4& v, const Vec4& plane);
+int clipTriangle(Vec4 clippedTriangle[6]);
 float dot(const Vec3& v, const Vec3& u);
 float dot(const Vec4& v, const Vec4& u);
 void printVector(const Vec3& v);

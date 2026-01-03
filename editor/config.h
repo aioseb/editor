@@ -25,12 +25,13 @@ extern ProjectionConfig projectionConfig;
 // Movement configurations
 struct MovementConfig {
 	float speed = 1.0f;
-	float sensitivity = 1.0f;
+	float sensitivity = 5.0f;
 };
 extern MovementConfig movementConfig;
 
 // Render configurations
 struct RenderConfig {
 	bool drawAxisEnabled = true;
+	bool hasBeenToggled = false;
 };
 extern RenderConfig renderConfig;

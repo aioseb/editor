@@ -51,6 +51,67 @@ Vec3 cross(const Vec3& v, const Vec3& u) {
 	return { x, y, z };
 }
 
+// Returns the intersection between a line and a plane in 3D space
+// Plane's vector must be normalized (aside from W, which is distance)
+Vec4 intersection(const Vec4& v, const Vec4& u, const Vec4& plane) {
+	float firstDistance = plane.x * v.x + plane.y * v.y + plane.z * v.z - plane.w * v.w;
+	float secondDistance = plane.x * u.x + plane.y * u.y + plane.z * u.z - plane.w * u.w;
+
+	return ((v * secondDistance) - (u * firstDistance)) / (secondDistance - firstDistance);
+}
+
+// Check if a vertex is inside a plane
+bool insidePlane(const Vec4& v, const Vec4& plane) {
+	return plane.x * v.x + plane.y * v.y + plane.z * v.z - plane.w * v.w <= 0;
+}
+
+// Clips given triangle, stores vertices in the given array and returns the number of available triangles
+// Sutherland-Hodgman algorithm
+int clipTriangle(Vec4 clippedTriangle[6]) {
+	int count = 3, updatedCount = 0;
+	Vec4 inputList[6];
+
+	for (int planeIndex = 0; planeIndex < 6; ++planeIndex) {
+		if (count <= 0) {
+			return 0;
+		}
+
+		const Vec4& plane = planes[planeIndex];
+		updatedCount = 0;
+
+		for (int index = 0; index < count; index++) {
+			inputList[index] = clippedTriangle[index];
+		}
+		
+		for (int vertexIndex = 0; vertexIndex < count; ++vertexIndex) {
+			Vec4 currentPoint = inputList[vertexIndex];
+			Vec4 prevPoint = inputList[(vertexIndex + count - 1) % count];
+
+			// Compute intersection only when needed
+			bool currentInside = insidePlane(currentPoint, plane);
+			bool prevInside = insidePlane(prevPoint, plane);
+
+			if (updatedCount < 6) {
+				if (currentInside) {
+					if (!prevInside) {
+						clippedTriangle[updatedCount++] = intersection(prevPoint, currentPoint, plane);
+					}
+					if (updatedCount < 6) {
+						clippedTriangle[updatedCount++] = currentPoint;
+					}
+				}
+				else if (prevInside) {
+					clippedTriangle[updatedCount++] = intersection(prevPoint, currentPoint, plane);
+				}
+			}
+		}
+
+		count = updatedCount;
+	}
+
+	return count;
+}
+
 // Returns the dot product of two 3D vectors
 float dot(const Vec3& v, const Vec3& u) {
 	float x = v.x * u.x;

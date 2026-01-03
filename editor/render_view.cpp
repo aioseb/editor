@@ -15,9 +15,9 @@ void drawAxis() {
 	cameraUp = cameraUp * -scale;
 	cameraForward = cameraForward * -scale;
 
-	drawLine(halfWidth + cameraRight.x, halfHeight + cameraRight.y, halfWidth, halfHeight);			// X axis
-	drawLine(halfWidth + cameraForward.x, halfHeight + cameraForward.y, halfWidth, halfHeight);		// Z axis
-	drawLine(halfWidth + cameraUp.x, halfHeight + cameraUp.y, halfWidth, halfHeight);				// Y axis
+	drawLine(halfWidth + cameraRight.x, halfHeight + cameraRight.y, halfWidth, halfHeight, sf::Color::Red);			// X axis
+	drawLine(halfWidth + cameraForward.x, halfHeight + cameraForward.y, halfWidth, halfHeight, sf::Color::Blue);	// Z axis
+	drawLine(halfWidth + cameraUp.x, halfHeight + cameraUp.y, halfWidth, halfHeight, sf::Color::Green);				// Y axis
 }
 
 // Draw a line on screen, given both coordinates and an optional color
@@ -71,16 +71,17 @@ void drawMesh(const Mesh& mesh) {
 		b = prodMatrixVec(mvp, b);
 		c = prodMatrixVec(mvp, c);
 
-		// TODO: Implement clipping
-		if (!isInsideDrawingSpace(a, b, c)) return;
+		// Clip resulting triangle
+		Vec4 clippedTriangle[6] = { a, b, c };
+		int count = clipTriangle(clippedTriangle);
 
-		a = toScreen(a, renderState.viewportMatrix);
-		b = toScreen(b, renderState.viewportMatrix);
-		c = toScreen(c, renderState.viewportMatrix);
-		
-		// TODO: Implement depth buffer
-		drawFace(a, b, c);	
-		drawTriangle(a, b, c);
+		for (int i = 0; i < count; i++) {
+			clippedTriangle[i] = toScreen(clippedTriangle[i], renderState.viewportMatrix);
+		}
+
+		for (int i = 1; i < count - 1; i++) {
+			drawTriangle(clippedTriangle[0], clippedTriangle[i], clippedTriangle[i + 1]);
+		}
 	}
 }
 
