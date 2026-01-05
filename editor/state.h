@@ -7,6 +7,10 @@ struct RenderState {
 	Mat4 viewMatrix;
 	Mat4 projMatrix;
 	Mat4 viewportMatrix;
+
+	uint8_t* colorBuffer;
+	float* depthBuffer;
+	sf::Texture texture;
 };
 extern RenderState renderState;
 

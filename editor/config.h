@@ -3,8 +3,8 @@
 
 // Screen / Viewport configurations
 struct ScreenConfig {
-	int width = 1920;
-	int height = 1080;
+	unsigned int width = 1920;
+	unsigned int height = 1080;
 
 	// Top-Left coordinates of the rendering area
 	const float X = 0.0f;	
@@ -25,7 +25,7 @@ extern ProjectionConfig projectionConfig;
 // Movement configurations
 struct MovementConfig {
 	float speed = 1.0f;
-	float sensitivity = 5.0f;
+	float sensitivity = 1.0f;
 };
 extern MovementConfig movementConfig;
 

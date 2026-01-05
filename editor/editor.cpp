@@ -6,9 +6,6 @@
 #include "state.h"
 #include "config.h"
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 int main() {
 	// Initialize render state and window
 	initializeRenderState();
@@ -91,6 +88,8 @@ int main() {
 	setTranslation(triangle, worldRight * 4.0f);
 
 	sf::Clock clock;
+	
+	float x = 0;
 
 	while (screenConfig.window.isOpen()) {
 		timeState.deltaTime = clock.restart().asSeconds();
@@ -100,6 +99,8 @@ int main() {
 				screenConfig.window.close();
 			}
 		}
+
+		clearColorBuffer(BLACK);
 
 		// Draw triangle
 		drawMesh(triangle);
@@ -135,7 +136,6 @@ int main() {
 		angle += DELTA * timeState.deltaTime;
 		if (angle > PI * 2) angle = 0.0f;
 
-		screenConfig.window.display();
-		screenConfig.window.clear();
+		render();
 	}
 }

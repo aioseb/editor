@@ -7,8 +7,11 @@
 #include "mesh.h"
 
 void drawAxis();
-void drawLine(int ax, int ay, int bx, int by, sf::Color color = sf::Color::White);
-void drawFace(Vec4 a, Vec4 b, Vec4 c);
-void drawTriangle(Vec4 a, Vec4 b, Vec4 c);
+void drawFace(Vec4 a, Vec4 b, Vec4 c, Color color = BLUE);
+void drawLine(int ax, int ay, int bx, int by, Color color = WHITE);
+void drawTopTriangle(Vec4 v0, Vec4 v1, Vec4 v2, Color color);
+void drawTriangle(const Vec4& a, const Vec4& b, const Vec4& c);
 void drawMesh(const Mesh& mesh);
+void render();
 bool isInsideDrawingSpace(Vec4 a, Vec4 b, Vec4 c);
+bool isInsideTriangle(Vec4 tri0, Vec4 tri1, Vec4 tri2, Vec4 a);

@@ -140,6 +140,7 @@
     <ClCompile Include="render_controller.cpp" />
     <ClCompile Include="render_view.cpp" />
     <ClCompile Include="state.cpp" />
+    <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera_controller.h" />
@@ -151,6 +152,7 @@
     <ClInclude Include="render_controller.h" />
     <ClInclude Include="render_view.h" />
     <ClInclude Include="state.h" />
+    <ClInclude Include="utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
