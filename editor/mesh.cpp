@@ -25,6 +25,7 @@ Mesh createMesh(Vec4* vertices, int verticesCount, Face* faces, int facesCount) 
 		mesh.faces[i].indices[0] = faces[i].indices[0];
 		mesh.faces[i].indices[1] = faces[i].indices[1];
 		mesh.faces[i].indices[2] = faces[i].indices[2];
+		mesh.faces[i].color = randomColor();	// Assign a random color to each triangle of a mesh
 	}
 
 	mesh.modelMatrix = identityMatrix();
@@ -49,6 +50,7 @@ Mesh createMesh(Vec4* vertices, int verticesCount, Face* faces, int facesCount, 
 		mesh.faces[i].indices[0] = faces[i].indices[0];
 		mesh.faces[i].indices[1] = faces[i].indices[1];
 		mesh.faces[i].indices[2] = faces[i].indices[2];
+		mesh.faces[i].color = randomColor();	// Assign a random color to each face of a mesh
 	}
 
 	mesh.translation = translation;

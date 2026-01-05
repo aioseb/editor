@@ -52,6 +52,58 @@ void drawLine(int ax, int ay, int bx, int by, Color color) {
 	}
 }
 
+// Draw a line on screen, taking depth into consideration
+void drawLineDepth(Vec4 v0, Vec4 v1, Color color) {
+	int ax = v0.x;
+	int ay = v0.y;
+	int bx = v1.x;
+	int by = v1.y;
+
+	float az = v0.z;
+	float bz = v1.z;
+
+	int dx = std::abs(ax - bx);
+	int dy = std::abs(ay - by);
+
+	int sx = (ax < bx) ? 1 : -1;
+	int sy = (ay < by) ? 1 : -1;
+
+	int err = dx - dy;
+
+	// Precompute values for depth interpolation
+	float w0 = 1.0f / az;
+	float w1 = 1.0f / bz;
+	int steps = std::max(dx, dy);
+
+	float dw = (w1 - w0) / steps;
+	float w = w0;
+
+	while (true) {
+		int bufferIndex = ay * screenConfig.width + ax;
+		if (renderState.depthBuffer[bufferIndex] > w) {
+			putPixel(ax, ay, color);
+			renderState.depthBuffer[bufferIndex] = w;
+		}
+		w += dw;
+
+		if (ax == bx && ay == by) {
+			break;
+		}
+
+		int e2 = err << 1;
+
+		if (e2 > -dy) {
+			err -= dy;
+			ax += sx;
+		}
+
+		if (e2 < dx) {
+			err += dx;
+			ay += sy;
+		}
+	}
+}
+
 // Draw a triangle on the screen, given local coordinates and the MVP
 void drawTriangle(const Vec4& a, const Vec4& b, const Vec4& c) {
 	drawLine(a.x, a.y, b.x, b.y);
@@ -76,9 +128,14 @@ void drawTopTriangle(Vec4 v0, Vec4 v1, Vec4 v2, Color color) {
 	if (v2.y < v0.y) std::swap(v2, v0);
 	if (v2.y < v1.y) std::swap(v1, v2);
 
-	int x0 = v0.x, y0 = v0.y;
-	int x1 = v1.x, y1 = v1.y;
-	int x2 = v2.x, y2 = v2.y;
+	int x0 = v0.x, y0 = v0.y, z0 = v0.z;
+	int x1 = v1.x, y1 = v1.y, z1 = v1.z;
+	int x2 = v2.x, y2 = v2.y, z2 = v2.z;
+
+	// Fill possible missing gaps on edges
+	drawLineDepth(v0, v1, color);
+	drawLineDepth(v0, v2, color);
+	drawLineDepth(v2, v1, color);
 
 	// Draw the top part of the triangle
 	// Pixel steps are calculated using Bresenham's line algorithm
@@ -101,7 +158,7 @@ void drawTopTriangle(Vec4 v0, Vec4 v1, Vec4 v2, Color color) {
 	int err02 = dx02 - dy02;
 
 	while (y0 < y1 && y0_t < y1) {
-		drawLine(x0, y0, x0_t, y0_t, color);	// Draw a scan line
+		drawLineDepth(v0, v1, color);
 
 		// Make sure both pixel steps are on the same height
 		// to avoid missing pixels in a face
@@ -132,7 +189,11 @@ void drawTopTriangle(Vec4 v0, Vec4 v1, Vec4 v2, Color color) {
 				y0_t += sy02;
 			}
 		}
+
+		v0.x = x0, v0.y = y0;
+		v1.x = x0_t, v1.y = y0_t;
 	}
+	drawLineDepth(v0, v1, color);
 }
 
 // Draw the bottom part of a triangle
@@ -142,9 +203,14 @@ void drawBottomTriangle(Vec4 v0, Vec4 v1, Vec4 v2, Color color) {
 	if (v2.y > v0.y) std::swap(v2, v0);
 	if (v2.y > v1.y) std::swap(v1, v2);
 
-	int x0 = v0.x, y0 = v0.y;
-	int x1 = v1.x, y1 = v1.y;
-	int x2 = v2.x, y2 = v2.y;
+	int x0 = v0.x, y0 = v0.y, z0 = v0.z;
+	int x1 = v1.x, y1 = v1.y, z1 = v1.z;
+	int x2 = v2.x, y2 = v2.y, z2 = v2.z;
+
+	// Fill possible missing gaps on edges
+	drawLineDepth(v0, v1, color);
+	drawLineDepth(v0, v2, color);
+	drawLineDepth(v2, v1, color);
 
 	// Draw the top part of the triangle
 	// Pixel steps are calculated using Bresenham's line algorithm
@@ -167,7 +233,7 @@ void drawBottomTriangle(Vec4 v0, Vec4 v1, Vec4 v2, Color color) {
 	int err02 = dx02 - dy02;
 
 	while (y0 > y1 && y0_t > y1) {
-		drawLine(x0, y0, x0_t, y0_t, color);	// Draw a scan line
+		drawLineDepth(v0, v1, color);
 
 		// Make sure both pixel steps are on the same height
 		// to avoid missing pixels in a face
@@ -198,8 +264,11 @@ void drawBottomTriangle(Vec4 v0, Vec4 v1, Vec4 v2, Color color) {
 				y0_t += sy02;
 			}
 		}
+
+		v0.x = x0, v0.y = y0;
+		v1.x = x0_t, v1.y = y0_t;
 	}
-	drawLine(x0, y0, x0_t, y0_t, color);
+	drawLineDepth(v0, v1, color);
 }
 
 // Draw a filled triangle on 2D screen using a scanline algorithm
@@ -277,16 +346,12 @@ void drawMesh(const Mesh& mesh) {
 		}
 
 		for (int i = 1; i < count - 1; i++) {
-			// drawTriangle(clippedTriangle[0], clippedTriangle[i], clippedTriangle[i + 1]);
+			drawFace(clippedTriangle[0], clippedTriangle[i], clippedTriangle[i + 1], faces[index].color);
 		}
 
-		for (int i = 1; i < count - 1; i++) {
-			drawFace(clippedTriangle[0], clippedTriangle[i], clippedTriangle[i + 1]);
-		}
-
-		for (int i = 1; i < count - 1; i++) {
-			// drawTriangle(clippedTriangle[0], clippedTriangle[i], clippedTriangle[i + 1]);
-		}
+		//for (int i = 1; i < count - 1; i++) {
+		//	drawTriangle(clippedTriangle[0], clippedTriangle[i], clippedTriangle[i + 1]);
+		//}
 	}
 }
 
@@ -294,10 +359,9 @@ void drawMesh(const Mesh& mesh) {
 void render() {
 	renderState.texture.update(renderState.colorBuffer);
 	sf::Sprite sprite(renderState.texture);
-
+	memset(renderState.depthBuffer, 0x7F, screenConfig.width * screenConfig.height * sizeof(float));
 	screenConfig.window.draw(sprite);
 	screenConfig.window.display();
-	screenConfig.window.clear();
 }
 
 // Checks if a triangle is inside drawing space given its vertices

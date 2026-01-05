@@ -9,7 +9,9 @@
 void drawAxis();
 void drawFace(Vec4 a, Vec4 b, Vec4 c, Color color = BLUE);
 void drawLine(int ax, int ay, int bx, int by, Color color = WHITE);
-void drawTopTriangle(Vec4 v0, Vec4 v1, Vec4 v2, Color color);
+void drawLineDepth(Vec4 v0, Vec4 v1, Color color = WHITE);
+void drawTopTriangle(Vec4 v0, Vec4 v1, Vec4 v2, Color color = WHITE);
+void drawBottomTriangle(Vec4 v0, Vec4 v1, Vec4 v2, Color color = WHITE);
 void drawTriangle(const Vec4& a, const Vec4& b, const Vec4& c);
 void drawMesh(const Mesh& mesh);
 void render();

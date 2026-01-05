@@ -1,5 +1,7 @@
 #pragma once
 #include <cstdint>
+#include <random>
+#include <time.h>
 
 struct Color {
 	uint8_t r = 255;
@@ -13,3 +15,5 @@ constexpr Color BLACK = { 0, 0, 0, 255 };
 constexpr Color RED = { 255, 0, 0, 255 };
 constexpr Color GREEN = { 0, 255, 0, 255 };
 constexpr Color BLUE = { 0, 0, 255, 255 };
+
+Color randomColor();

@@ -11,6 +11,7 @@
 struct Face {
 	int indices[3];
 	Vec3 normal = worldUp;
+	Color color = WHITE;
 };
 
 struct Mesh {

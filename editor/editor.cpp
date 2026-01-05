@@ -107,10 +107,10 @@ int main() {
 
 		// Draw frist cube in 3D space and rotate it
 		drawMesh(cubeOne);
-		rotateBy(cubeOne, worldUp * DELTA * timeState.deltaTime);
+		// rotateBy(cubeOne, worldUp * DELTA * timeState.deltaTime);
 
 		// Draw second cube in 3D space and move it in circular motion
-		drawMesh(cubeTwo);
+		// drawMesh(cubeTwo);
 
 		float s = RADIUS * sin(angle);
 		float c = RADIUS * cos(angle);
@@ -123,7 +123,7 @@ int main() {
 
 		pyramid.vertices[0].y = RADIUS * sin(angle + PI * 0.5f) * 0.5f;
 		pyramid.vertices[0].x = RADIUS * cos(angle + PI * 0.5f) * 1.5f;
-		drawMesh(pyramid);
+		//drawMesh(pyramid);
 
 		// Draw world axis in the center of the screen
 		if (renderConfig.drawAxisEnabled) {

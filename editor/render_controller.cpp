@@ -41,10 +41,15 @@ void updateColorBufferSize() {
 		delete[] renderState.colorBuffer;
 	}
 
+	if (renderState.depthBuffer != nullptr) {
+		delete[] renderState.depthBuffer;
+	}
+
 	const unsigned int WIDTH = screenConfig.width;
 	const unsigned int HEIGHT = screenConfig.height;
 
 	renderState.colorBuffer = new uint8_t[WIDTH * HEIGHT * 4];
+	renderState.depthBuffer = new float[WIDTH * HEIGHT * 4];
 	renderState.texture.resize({WIDTH, HEIGHT});
 }
 
