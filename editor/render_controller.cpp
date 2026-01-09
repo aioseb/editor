@@ -23,7 +23,7 @@ void updateWindow() {
 	int width = screenConfig.width;
 	int height = screenConfig.height;
 
-	renderState.viewportMatrix = viewportMatrix(0, 0, width, height, 0, 1);
+	renderState.viewportMatrix = viewportMatrix(0.0f, 0.0f, width, height, 0.0f, 1.0f);
 	screenConfig.window.create(sf::VideoMode(sf::Vector2u(width, height)), "Test");
 }
 

@@ -23,18 +23,18 @@ int main() {
 	};
 
 	Face facesCube[12] = {
-		{0, 1, 2},
-		{0, 3, 2},
-		{4, 5, 6},
-		{4, 7, 6},
-		{0, 1, 5},
-		{0, 4, 5},
-		{3, 2, 6},
-		{3, 7, 6},
-		{3, 0, 4},
-		{3, 7, 4},
-		{2, 1, 5},
-		{2, 6, 5}
+		{0, 1, 2, worldUp},
+		{0, 3, 2, worldUp}, 
+		{4, 5, 6, worldUp * -1},
+		{4, 7, 6, worldUp * -1},
+		{0, 1, 5, worldRight},
+		{0, 4, 5, worldRight},
+		{3, 2, 6, worldRight * -1},
+		{3, 7, 6, worldRight * -1},
+		{3, 0, 4, worldForward},
+		{3, 7, 4, worldForward},
+		{2, 1, 5, worldForward * -1},
+		{2, 6, 5, worldForward * -1},
 	};
 
 	// Define the mesh for a pyramid
@@ -58,8 +58,8 @@ int main() {
 	// Define the mesh for a triangle
 	Vec4 verticesTriangle[3] = {
 		{  0.0f, 0.5f, 0.0f},
-		{  0.0f, 0.0f, 0.5f},
-		{ -0.5f, 0.0f, 0.0f}
+		{  0.0f, 0.5f, 0.5f},
+		{ -0.5f, 0.5f, 0.0f}
 	};
 
 	Face facesTriangle[1] = {

@@ -110,6 +110,6 @@ Mat4 modelMatrix(const Vec3& translate = zeroVector, const Vec3& scale = oneVect
 Mat4 lookAt(const Vec3& eye, const Vec3& target);
 Mat4 viewMatrix(const Vec3& camPos, const Vec3& camAngle);
 Mat4 projectionMatrix(float fovY, float aspectRatio, float front, float back);
-Mat4 viewportMatrix(float x, float y, float w, float h, float n, float f);
+Mat4 viewportMatrix(float x, float y, float w, float h, float n = 0.0f, float f = 1.0f);
 Vec4 clipCoords(const Vec4& v, const Mat4& model, const Mat4& view, const Mat4& projection);
 Vec4 toScreen(Vec4 v, const Mat4& viewport);

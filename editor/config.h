@@ -25,7 +25,7 @@ extern ProjectionConfig projectionConfig;
 // Movement configurations
 struct MovementConfig {
 	float speed = 1.0f;
-	float sensitivity = 1.0f;
+	float sensitivity = 0.01f;
 };
 extern MovementConfig movementConfig;
 

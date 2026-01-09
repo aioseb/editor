@@ -43,8 +43,8 @@ void handleMouseInput() {
 	int offsetY = my - mouseState.y;
 
 	// Apply sensitivity
-	cameraState.camAngle.y += offsetX * movementConfig.sensitivity * timeState.deltaTime; // yaw
-	cameraState.camAngle.x += offsetY * movementConfig.sensitivity * timeState.deltaTime; // pitch
+	cameraState.camAngle.y += offsetX * movementConfig.sensitivity; // yaw
+	cameraState.camAngle.x += offsetY * movementConfig.sensitivity; // pitch
 
 	// Clamp pitch (prevent flipping)
 	if (cameraState.camAngle.x > 1.5f) cameraState.camAngle.x = 1.5f;

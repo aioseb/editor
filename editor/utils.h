@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <random>
 #include <time.h>
+#include "config.h"
 
 struct Color {
 	uint8_t r = 255;
@@ -17,3 +18,4 @@ constexpr Color GREEN = { 0, 255, 0, 255 };
 constexpr Color BLUE = { 0, 0, 255, 255 };
 
 Color randomColor();
+float linearizeDepth(float depth);
