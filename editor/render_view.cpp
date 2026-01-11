@@ -140,9 +140,51 @@ float edgeFunction(const Vec4& a, const Vec4& b, const Vec4& c) {
 	return (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x);
 }
 
+float setupEdge(const Vec4 & a, const Vec4 & b, float startX, float startY, float& A, float& B, float& C){
+	A = (b.y - a.y);
+	B = (a.x - b.x);
+	C = -B * a.y - A * a.x;
+	return (startX - a.x) * A + (startY - a.y) * B;
+};
+
+// Check if a tile is fully inside an edge
+inline bool tileInside(float w, float A, float B, bool areaPositive)
+{
+	float w0 = w;                  // top-left
+	float w1 = w + A - 1;          // top-right
+	float w2 = w + B - 1;          // bottom-left
+	float w3 = w + A + B - 2;      // bottom-right
+
+	if (areaPositive) {
+		return (w0 >= 0.0f && w1 >= 0.0f && w2 >= 0.0f && w3 >= 0.0f);
+	}
+	else {
+		return (w0 <= 0.0f && w1 <= 0.0f && w2 <= 0.0f && w3 <= 0.0f);
+	}
+}
+
+// Check if a tile is fully outside an edge
+// Check if a tile is fully inside an edge
+inline bool tileOutside(float w, float A, float B, bool areaPositive)
+{
+	float w0 = w;                  // top-left
+	float w1 = w + A - 1;          // top-right
+	float w2 = w + B - 1;          // bottom-left
+	float w3 = w + A + B - 2;      // bottom-right
+
+	if (areaPositive) {
+		return (w0 < 0.0f && w1 < 0.0f && w2 < 0.0f && w3 < 0.0f);
+	}
+	else {
+		return (w0 > 0.0f && w1 > 0.0f && w2 > 0.0f && w3 > 0.0f);
+	}
+}
+
 void drawTriangleDepth(const Vec4& v0, const Vec4& v1, const Vec4& v2, Color color) {
 	float area = edgeFunction(v0, v1, v2);
 	if (std::abs(area) < 1e-6f) return;
+
+	const float TILE_SIZE = 32.0f;
 
 	int minX = max(0, (int)std::floor(std::min({ v0.x, v1.x, v2.x })));
 	int maxX = min(screenConfig.width - 1, (int)std::ceil(std::max({ v0.x, v1.x, v2.x })));
@@ -152,13 +194,6 @@ void drawTriangleDepth(const Vec4& v0, const Vec4& v1, const Vec4& v2, Color col
 	float invArea = 1.0f / area;
 	bool areaPositive = (area > 0.0f);
 
-	auto setupEdge = [](const Vec4& a, const Vec4& b, float startX, float startY, float& A, float& B, float& C) -> float {
-		A = (b.y - a.y);
-		B = (a.x - b.x);
-		C = -B * a.y - A * a.x;
-		return (startX - a.x) * A + (startY - a.y) * B;
-		};
-
 	float A0, B0, C0, A1, B1, C1, A2, B2, C2;
 	float sampleX = (float)minX + 0.5f;
 	float sampleY = (float)minY + 0.5f;
@@ -167,28 +202,32 @@ void drawTriangleDepth(const Vec4& v0, const Vec4& v1, const Vec4& v2, Color col
 	float w1_row = setupEdge(v2, v0, sampleX, sampleY, A1, B1, C1);
 	float w2_row = setupEdge(v0, v1, sampleX, sampleY, A2, B2, C2);
 
-	float invW0 = 1.0f / v0.w;
-	float invW1 = 1.0f / v1.w;
-	float invW2 = 1.0f / v2.w;
-
-	float zOverW0 = v0.z * invW0;
-	float zOverW1 = v1.z * invW1;
-	float zOverW2 = v2.z * invW2;
+	float z0 = v0.z;
+	float z1 = v1.z;
+	float z2 = v2.z;
 	
 	// Precompute coefficients of p(x, y) = ap * x + bp * y + cp
-	float ap = (A0 * zOverW0 + A1 * zOverW1 + A2 * zOverW2) * invArea;
-	float bp = (B0 * zOverW0 + B1 * zOverW1 + B2 * zOverW2) * invArea;
-	float cp = (C0 * zOverW0 + C1 * zOverW1 + C2 * zOverW2) * invArea;
+	float ap = (A0 * z0 + A1 * z1 + A2 * z2) * invArea;
+	float bp = (B0 * z0 + B1 * z1 + B2 * z2) * invArea;
+	float cp = (C0 * z0 + C1 * z1 + C2 * z2) * invArea;
 
 	// Precompute coefficients of q(x, y) = aq * x + bq * y + cq
-	float aq = (A0 * invW0 + A1 * invW1 + A2 * invW2) * invArea;
-	float bq = (B0 * invW0 + B1 * invW1 + B2 * invW2) * invArea;
-	float cq = (C0 * invW0 + C1 * invW1 + C2 * invW2) * invArea;
+	float aq = (A0 + A1 + A2) * invArea;
+	float bq = (B0 + B1 + B2) * invArea;
+	float cq = (C0 + C1 + C2) * invArea;
 
 	float px_row = ap * sampleX + bp * sampleY + cp;
 	float qx_row = aq * sampleX + bq * sampleY + cq;
 
-	for (int y = minY; y <= maxY; ++y) {
+	float tileA0, tileA1, tileA2, tileB0, tileB1, tileB2;
+	tileA0 = A0 * TILE_SIZE;
+	tileA1 = A1 * TILE_SIZE;
+	tileA2 = A2 * TILE_SIZE;
+	tileB0 = B0 * TILE_SIZE;
+	tileB1 = B1 * TILE_SIZE;
+	tileB2 = B2 * TILE_SIZE;
+
+	for (int y = minY; y <= maxY; y += (int)TILE_SIZE) {
 		float w0 = w0_row;
 		float w1 = w1_row;
 		float w2 = w2_row;
@@ -196,51 +235,124 @@ void drawTriangleDepth(const Vec4& v0, const Vec4& v1, const Vec4& v2, Color col
 		float px = px_row;
 		float qx = qx_row;
 
-		for (int x = minX; x <= maxX; ++x) {
-			bool inside = false;
-			if ((areaPositive && (w0 >= 0.0f && w1 >= 0.0f && w2 >= 0.0f)) ||
-				(!areaPositive && (w0 <= 0.0f && w1 <= 0.0f && w2 <= 0.0f))) {
-				inside = true;
+		for (int x = minX; x <= maxX; x += (int)TILE_SIZE) {
+			bool tileInside0 = tileInside(w0, tileA0, tileB0, areaPositive);
+			bool tileInside1 = tileInside(w1, tileA1, tileB1, areaPositive);
+			bool tileInside2 = tileInside(w2, tileA2, tileB2, areaPositive);
+			bool allInside = tileInside0 && tileInside1 && tileInside2;
+
+			bool tileOutside0 = tileOutside(w0, tileA0, tileB0, areaPositive);
+			bool tileOutside1 = tileOutside(w1, tileA1, tileB1, areaPositive);
+			bool tileOutside2 = tileOutside(w2, tileA2, tileB2, areaPositive);
+			bool oneOutside = tileOutside0 || tileOutside1 || tileOutside2;
+
+			// Skip if there is a tile fully outside
+			if (oneOutside) {
+				w0 += tileA0;
+				w1 += tileA1;
+				w2 += tileA2;
+
+				px += ap * TILE_SIZE;
+				qx += aq * TILE_SIZE;
+				continue;
 			}
 
-			if (inside) {
-				int idx = y * screenConfig.width + x;
-				float currentDepth = renderState.depthBuffer[idx];
+			// If all tiles are fully inside, fill tile without
+			// taking into account barycentric weights (w0, w1, w2)
+			if (allInside) {
+				for (int row = 0; row < (int)TILE_SIZE; ++row) {
+					float _px = px + (float)row * bp;
+					float _qx = qx + (float)row * bq;
 
-				if (px > currentDepth * qx) {
-					float ndc_z = px / qx; 
+					for (int col = 0; col < (int)TILE_SIZE; ++col){
+						int idx = (y + row) * screenConfig.width + (x + col);
+						float currentDepth = renderState.depthBuffer[idx];
 
-					if (ndc_z > renderState.depthBuffer[idx]) {
-						renderState.depthBuffer[idx] = ndc_z;
+						if (_px > currentDepth * _qx) {
+							float ndc_z = _px / _qx;
+							renderState.depthBuffer[idx] = ndc_z;
 
-						if (renderConfig.drawDepthMap) {
-							unsigned char depthValue = (unsigned char)(255.f * ndc_z);
-							if (depthValue > 255) depthValue = 255;
-							putPixel(x, y, { depthValue, depthValue, depthValue });
+							if (renderConfig.drawDepthMap) {
+								unsigned char depthValue = (unsigned char)(255.f * ndc_z);
+								if (depthValue > 255) depthValue = 255;
+								putPixel(x + col, y + row, { depthValue, depthValue, depthValue });
+							}
+							else {
+								putPixel(x + col, y + row, color);
+							}
 						}
-						else {
-							putPixel(x, y, color);
+
+						_px += ap;
+						_qx += aq;
+					}
+				}
+			}
+			else {
+				// The given tile is partially inside the edge
+				// Take baryocentric weights into consideration
+				for (int row = 0; row < (int)TILE_SIZE; ++row) {
+					float _px = px + (float)row * bp;
+					float _qx = qx + (float)row * bq;
+
+					float _w0 = w0 + (float)row * B0;
+					float _w1 = w1 + (float)row * B1;
+					float _w2 = w2 + (float)row * B2;
+
+					for (int col = 0; col < (int)TILE_SIZE; ++col) {
+						bool inside = false;
+						if ((areaPositive && (_w0 >= 0.0f && _w1 >= 0.0f && _w2 >= 0.0f)) ||
+							(!areaPositive && (_w0 <= 0.0f && _w1 <= 0.0f && _w2 <= 0.0f))) {
+							inside = true;
 						}
+
+						if (inside) {
+							int idx = (y + row) * screenConfig.width + (x + col);
+							float currentDepth = renderState.depthBuffer[idx];
+
+							if (_px > currentDepth * _qx) {
+								float ndc_z = _px / _qx;
+
+								if (ndc_z > renderState.depthBuffer[idx]) {
+									renderState.depthBuffer[idx] = ndc_z;
+
+									if (renderConfig.drawDepthMap) {
+										unsigned char depthValue = (unsigned char)(255.f * ndc_z);
+										if (depthValue > 255) depthValue = 255;
+										putPixel(x + col, y + row, { depthValue, depthValue, depthValue });
+									}
+									else {
+										putPixel(x + col, y + row, color);
+									}
+								}
+							}
+						}
+
+						_w0 += A0;
+						_w1 += A1;
+						_w2 += A2;
+
+						_px += ap;
+						_qx += aq;
 					}
 				}
 			}
 
 			// step in x
-			w0 += A0;
-			w1 += A1;
-			w2 += A2;
+			w0 += tileA0;
+			w1 += tileA1;
+			w2 += tileA2;
 
-			px += ap;
-			qx += aq;
+			px += ap * TILE_SIZE;
+			qx += aq * TILE_SIZE;
 		}
 
 		// step in y
-		w0_row += B0;
-		w1_row += B1;
-		w2_row += B2;
+		w0_row += tileB0;
+		w1_row += tileB1;
+		w2_row += tileB2;
 
-		px_row += bp;
-		qx_row += bq;
+		px_row += bp * TILE_SIZE;
+		qx_row += bq * TILE_SIZE;
 	}
 }
 
