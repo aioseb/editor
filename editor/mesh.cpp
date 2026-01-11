@@ -25,7 +25,8 @@ Mesh createMesh(Vec4* vertices, int verticesCount, Face* faces, int facesCount) 
 		mesh.faces[i].indices[0] = faces[i].indices[0];
 		mesh.faces[i].indices[1] = faces[i].indices[1];
 		mesh.faces[i].indices[2] = faces[i].indices[2];
-		mesh.faces[i].color = randomColor();	// Assign a random color to each triangle of a mesh
+		mesh.faces[i].normal = faces[i].normal;
+		mesh.faces[i].color = faces[i].color;
 	}
 
 	mesh.modelMatrix = identityMatrix();
@@ -50,7 +51,8 @@ Mesh createMesh(Vec4* vertices, int verticesCount, Face* faces, int facesCount, 
 		mesh.faces[i].indices[0] = faces[i].indices[0];
 		mesh.faces[i].indices[1] = faces[i].indices[1];
 		mesh.faces[i].indices[2] = faces[i].indices[2];
-		mesh.faces[i].color = randomColor();	// Assign a random color to each face of a mesh
+		mesh.faces[i].normal = faces[i].normal;
+		mesh.faces[i].color = faces[i].color;
 	}
 
 	mesh.translation = translation;
@@ -60,6 +62,16 @@ Mesh createMesh(Vec4* vertices, int verticesCount, Face* faces, int facesCount, 
 	updateModelMatrix(mesh);
 
 	return mesh;
+}
+
+// --------------------------------------------------------------------------
+// ----------------------- MESH CUSTOMIZATIONS ------------------------------
+// --------------------------------------------------------------------------
+void setColor(Mesh& mesh, Color color) {
+	std::swap(color.b, color.g);
+	for (int i = 0; i < mesh.facesCount; i++) {
+		mesh.faces[i].color = color;
+	}
 }
 
 // --------------------------------------------------------------------------

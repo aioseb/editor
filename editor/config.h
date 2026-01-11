@@ -1,5 +1,6 @@
 #pragma once
 #include "SFML/Graphics.hpp";
+#include "matrices.h"
 
 // Screen / Viewport configurations
 struct ScreenConfig {
@@ -29,9 +30,22 @@ struct MovementConfig {
 };
 extern MovementConfig movementConfig;
 
+// Light configurations
+struct LightConfig {
+	float ambientIntensity = 0.2f;
+	Vec4 lightDirection = { 0.0f, 1.0f, 0.0f, 0.0f };
+};
+extern LightConfig lightConfig;
+
 // Render configurations
 struct RenderConfig {
 	bool drawAxisEnabled = true;
-	bool hasBeenToggled = false;
+	bool axisHasBeenToggled = false;
+
+	bool drawWireframe = false;
+	bool wireframeHasBeenToggled = false;
+
+	bool drawDepthMap = false;
+	bool depthHasBeenToggled = false;
 };
 extern RenderConfig renderConfig;

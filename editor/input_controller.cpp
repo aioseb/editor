@@ -23,12 +23,28 @@ void handleKeyboardInput() {
 		cameraShift(worldUp * -units);
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X) && !renderConfig.hasBeenToggled) {
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X) && !renderConfig.axisHasBeenToggled) {
 		renderConfig.drawAxisEnabled = !renderConfig.drawAxisEnabled;
-		renderConfig.hasBeenToggled = true;
+		renderConfig.axisHasBeenToggled = true;
 	}
 	else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X)) {
-		renderConfig.hasBeenToggled = false;
+		renderConfig.axisHasBeenToggled = false;
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::C) && !renderConfig.wireframeHasBeenToggled) {
+		renderConfig.drawWireframe = !renderConfig.drawWireframe;
+		renderConfig.wireframeHasBeenToggled = true;
+	}
+	else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Key::C)) {
+		renderConfig.wireframeHasBeenToggled = false;
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::V) && !renderConfig.depthHasBeenToggled) {
+		renderConfig.drawDepthMap = !renderConfig.drawDepthMap;
+		renderConfig.depthHasBeenToggled = true;
+	}
+	else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Key::V)) {
+		renderConfig.depthHasBeenToggled = false;
 	}
 }
 

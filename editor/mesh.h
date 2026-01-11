@@ -32,6 +32,9 @@ struct Mesh {
 Mesh createMesh(Vec4* vertices, int verticesCount, Face* faces, int facesCount);
 Mesh createMesh(Vec4* vertices, int verticesCount, Face* faces, int facesCount, Vec3 translation, Vec3 rotation, Vec3 scaling);
 
+// Mesh customization
+void setColor(Mesh& mesh, Color color);
+
 // Mesh transformations
 void setTranslation(Mesh& mesh, Vec3 translation);
 void setRotation(Mesh& mesh, Vec3 rotation);
