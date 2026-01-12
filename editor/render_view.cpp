@@ -52,78 +52,48 @@ void drawLine(int ax, int ay, int bx, int by, Color color) {
 	}
 }
 
-// Draw a line on screen, taking depth into consideration
-void drawLineDepth(Vec4 v0, Vec4 v1, Color color) {
-	int ax = v0.x;
-	int ay = v0.y;
-	int bx = v1.x;
-	int by = v1.y;
+// Draw a line in the scene, given world space coordinates
+void drawLineWorldSpace(Vec4 a, Vec4 b, Color color) {
+	Mat4& view = renderState.viewMatrix;
+	Mat4& proj = renderState.projMatrix;
+	Mat4 viewProj = prodMatrix(proj, view);
 
-	float az = v0.z;
-	float bz = v1.z;
+	a = prodMatrixVec(viewProj, a);
+	b = prodMatrixVec(viewProj, b);
 
-	int dx = std::abs(ax - bx);
-	int dy = std::abs(ay - by);
+	// Clip line against the 6 planes of NDC cube
+	for (int planeIndex = 0; planeIndex < 6; ++planeIndex) {
+		const Vec4& plane = planes[planeIndex];
+		Vec4 intersectedPoint = intersection(a, b, plane);
 
-	int sx = (ax < bx) ? 1 : -1;
-	int sy = (ay < by) ? 1 : -1;
+		bool insidePlaneA = insidePlane(a, plane);
+		bool insidePlaneB = insidePlane(b, plane);
 
-	int err = dx - dy;
-
-	// Precompute values for depth interpolation
-	const float EPS = 1e-6f;
-
-	float w0 = az;
-	float w1 = bz;
-	int steps = std::max(dx, dy);
-
-	float dw = (w1 - w0) / float(steps);
-
-	float w = w0;
-
-	if (steps == 0) {
-		int idx = ay * screenConfig.width + ax;
-		if (w0 > renderState.depthBuffer[idx]) {
-			renderState.depthBuffer[idx] = w0;
-			putPixel(ax, ay, color);
+		// If both are outside the plane, discard the line
+		if (!insidePlaneA && !insidePlaneB) {
+			return;
 		}
-		return;
+
+		if (!insidePlaneA) {
+			a = intersectedPoint;
+		}
+		else if (!insidePlaneB) {
+			b = intersectedPoint;
+		}
 	}
 
-	while (true) {
-		int bufferIndex = ay * screenConfig.width + ax;
-		if (renderState.depthBuffer[bufferIndex] < 1 / w) {
-			float temp = 1 / w;
-			putPixel(ax, ay, {(unsigned char)(255 * temp), (unsigned char)(255 * temp), (unsigned char)(255 * temp)});
-			renderState.depthBuffer[bufferIndex] = 1 / w;
+	Mat4& viewport = renderState.viewportMatrix;
+	a = toScreen(a, viewport);
+	b = toScreen(b, viewport);
 
-		}
-
-		if (ax == bx && ay == by) {
-			break;
-		}
-
-		int e2 = err << 1;
-
-		if (e2 > -dy) {
-			err -= dy;
-			ax += sx;
-		}
-
-		if (e2 < dx) {
-			err += dx;
-			ay += sy;
-		}
-
-		w += dw;
-	}
+	drawLine(a.x, a.y, b.x, b.y, color);
 }
 
 // Draw a triangle on the screen, given local coordinates and the MVP
-void drawTriangle(const Vec4& a, const Vec4& b, const Vec4& c) {
-	drawLine(a.x, a.y, b.x, b.y);
-	drawLine(b.x, b.y, c.x, c.y);
-	drawLine(c.x, c.y, a.x, a.y);
+void drawTriangle(const Vec4& a, const Vec4& b, const Vec4& c, Color color) {
+	drawLine(a.x, a.y, b.x, b.y, color);
+	drawLine(b.x, b.y, c.x, c.y, color);
+	drawLine(c.x, c.y, a.x, a.y, color);
 }
 
 int min(int a, int b) {
@@ -362,7 +332,7 @@ void drawFace(Vec4 v0, Vec4 v1, Vec4 v2, Vec3 normal, Color color) {
 }
 
 // Draws mesh in 3D space
-void drawMesh(const Mesh& mesh) {
+void drawMesh(const Mesh& mesh, bool drawEdges, Color edgesColor) {
 	const Mat4& mvp = calculateMVP(mesh.modelMatrix);
 	Mat4 rotationMatrix = modelMatrix(zeroVector, oneVector, mesh.rotation);
 
@@ -420,9 +390,9 @@ void drawMesh(const Mesh& mesh) {
 			drawFace(clippedTriangle[0], clippedTriangle[i], clippedTriangle[i + 1], normal, shadedColor);
 		}
 
-		if (renderConfig.drawWireframe) {
+		if (renderConfig.drawWireframe || drawEdges) {
 			for (int i = 1; i < count - 1; i++) {
-				drawTriangle(clippedTriangle[0], clippedTriangle[i], clippedTriangle[i + 1]);
+				drawTriangle(clippedTriangle[0], clippedTriangle[i], clippedTriangle[i + 1], edgesColor);
 			}
 		}
 	}

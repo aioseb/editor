@@ -50,9 +50,24 @@ void handleKeyboardInput() {
 
 // Rotate on mouse move
 void handleMouseInput() {
+	// Mouse click
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+		if (!mouseState.mouseDown) {
+			mouseState.mouseClicked = true;
+		}
+		else {
+			mouseState.mouseClicked = false;
+		}
+
+		mouseState.mouseDown = true;
+	}
+	else {
+		mouseState.mouseDown = false;
+	}
+
 	// Mouse look
-	int mx = sf::Mouse::getPosition().x;
-	int my = sf::Mouse::getPosition().y;
+	int mx = sf::Mouse::getPosition(screenConfig.window).x;
+	int my = sf::Mouse::getPosition(screenConfig.window).y;
 
 	// Calculate offset from last frame
 	int offsetX = mouseState.x - mx;

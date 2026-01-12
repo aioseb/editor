@@ -89,6 +89,7 @@ void printVector(const Vec4& v);
 
 Vec4 prodMatrixVec(const Mat4& mat, const Vec4& v);
 Mat4 prodMatrix(const Mat4& a, const Mat4& b);
+Mat4 inverseMatrix(const Mat4& mat);
 Mat4 identityMatrix();	
 
 // -------------------------------------------------------------------------------------

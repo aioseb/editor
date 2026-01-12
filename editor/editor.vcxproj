@@ -139,6 +139,7 @@
     <ClCompile Include="mesh.cpp" />
     <ClCompile Include="render_controller.cpp" />
     <ClCompile Include="render_view.cpp" />
+    <ClCompile Include="scene.cpp" />
     <ClCompile Include="state.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
@@ -151,6 +152,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="render_controller.h" />
     <ClInclude Include="render_view.h" />
+    <ClInclude Include="scene.h" />
     <ClInclude Include="state.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
