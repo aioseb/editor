@@ -25,8 +25,10 @@ extern CameraState cameraState;
 struct MouseState {
 	int x;
 	int y;
-	bool mouseClicked;
-	bool mouseDown;
+	bool mouseLeftClicked;
+	bool mouseLeftDown;
+	bool mouseRightClicked;
+	bool mouseRightDown;
 };
 extern MouseState mouseState;
 

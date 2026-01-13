@@ -5,7 +5,12 @@
 #include "config.h"
 #include "camera_controller.h"
 #include "render_controller.h"
+#include "scene.h"
 
-void handleKeyboardInput();
-void handleMouseInput();
 void handleInputs();
+void handleKeyboardInput();
+void handleVertexSelection();
+void handleMeshSelection();
+void handleMouseInput();
+void handleMouseRotation();
+void updateViewMatrix();

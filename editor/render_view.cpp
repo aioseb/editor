@@ -342,6 +342,8 @@ void drawMesh(const Mesh& mesh, bool drawEdges, Color edgesColor) {
 	Vec4* vertices = mesh.vertices;
 	Face* faces = mesh.faces;
 
+	bool selectedVertexDrawn = false;
+
 	// Extract each index / face of the mesh and draw it on screen
 	for (int index = 0; index < facesCount; index++) {
 		Vec4 a = vertices[faces[index].indices[0]];

@@ -4,25 +4,27 @@
 void handleKeyboardInput() {
 	float units = movementConfig.speed * timeState.deltaTime;
 
+	// Move camera/vertex upon WASD input
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W)) {
-		cameraShift(worldForward * units);
+		renderConfig.editMode ? translateVertexBy(worldForward * timeState.deltaTime) : cameraShift(worldForward * units);
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) {
-		cameraShift(worldForward * -units);
+		renderConfig.editMode ? translateVertexBy(worldForward * -timeState.deltaTime) : cameraShift(worldForward * -units);
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
-		cameraShift(worldRight * -units);
+		renderConfig.editMode ? translateVertexBy(worldRight * timeState.deltaTime) : cameraShift(worldRight * -units);
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-		cameraShift(worldRight * units);
+		renderConfig.editMode ? translateVertexBy(worldRight * -timeState.deltaTime) : cameraShift(worldRight * units);
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::E)) {
-		cameraShift(worldUp * units);
+		renderConfig.editMode ? translateVertexBy(worldUp * timeState.deltaTime) : cameraShift(worldUp * units);
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Q)) {
-		cameraShift(worldUp * -units);
+		renderConfig.editMode ? translateVertexBy(worldUp * -timeState.deltaTime) : cameraShift(worldUp * -units);
 	}
 
+	// Toggle various rendering configurations
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::X) && !renderConfig.axisHasBeenToggled) {
 		renderConfig.drawAxisEnabled = !renderConfig.drawAxisEnabled;
 		renderConfig.axisHasBeenToggled = true;
@@ -46,25 +48,53 @@ void handleKeyboardInput() {
 	else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Key::V)) {
 		renderConfig.depthHasBeenToggled = false;
 	}
+
+	// Toggle editing mode
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space) && !renderConfig.editModeHasBeenToggled) {
+		renderConfig.editMode = !renderConfig.editMode;
+		renderConfig.editModeHasBeenToggled = true;
+	}
+	else if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space)) {
+		renderConfig.editModeHasBeenToggled = false;
+	}
 }
 
-// Rotate on mouse move
+// Handle mouse input
 void handleMouseInput() {
 	// Mouse click
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-		if (!mouseState.mouseDown) {
-			mouseState.mouseClicked = true;
+		if (!mouseState.mouseLeftDown) {
+			mouseState.mouseLeftClicked = true;
 		}
 		else {
-			mouseState.mouseClicked = false;
+			mouseState.mouseLeftClicked = false;
 		}
 
-		mouseState.mouseDown = true;
+		mouseState.mouseLeftDown = true;
 	}
 	else {
-		mouseState.mouseDown = false;
+		mouseState.mouseLeftClicked = false;
+		mouseState.mouseLeftDown = false;
 	}
 
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) {
+		if (!mouseState.mouseRightDown) {
+			mouseState.mouseRightClicked = true;
+		}
+		else {
+			mouseState.mouseRightClicked = false;
+		}
+
+		mouseState.mouseRightDown = true;
+	}
+	else {
+		mouseState.mouseRightClicked = false;
+		mouseState.mouseRightDown = false;
+	}
+}
+
+// Handles mouse rotation
+void handleMouseRotation() {
 	// Mouse look
 	int mx = sf::Mouse::getPosition(screenConfig.window).x;
 	int my = sf::Mouse::getPosition(screenConfig.window).y;
@@ -73,22 +103,41 @@ void handleMouseInput() {
 	int offsetX = mouseState.x - mx;
 	int offsetY = my - mouseState.y;
 
-	// Apply sensitivity
-	cameraState.camAngle.y += offsetX * movementConfig.sensitivity; // yaw
-	cameraState.camAngle.x += offsetY * movementConfig.sensitivity; // pitch
+	if (mouseState.mouseRightDown) {
+		// Apply sensitivity
+		cameraState.camAngle.y += offsetX * movementConfig.sensitivity; // yaw
+		cameraState.camAngle.x += offsetY * movementConfig.sensitivity; // pitch
 
-	// Clamp pitch (prevent flipping)
-	if (cameraState.camAngle.x > 1.5f) cameraState.camAngle.x = 1.5f;
-	if (cameraState.camAngle.x < -1.5f) cameraState.camAngle.x = -1.5f;
+		// Clamp pitch (prevent flipping)
+		if (cameraState.camAngle.x > 1.5f) cameraState.camAngle.x = 1.5f;
+		if (cameraState.camAngle.x < -1.5f) cameraState.camAngle.x = -1.5f;
+	}
 
 	// Save new mouse position
 	mouseState.x = mx;
 	mouseState.y = my;
 }
 
+// Handles mesh selection
+void handleMeshSelection() {
+	if (mouseState.mouseLeftClicked) {
+		pickMeshAt(mouseState.x, mouseState.y);
+	}
+}
+
+// Handles vertex selection
+void handleVertexSelection() {
+	if (mouseState.mouseLeftClicked) {
+		pickVertexAt(mouseState.x, mouseState.y);
+	}
+}
+
 // Handle all existing inputs
 void handleInputs() {
 	handleKeyboardInput();
 	handleMouseInput();
+	handleMeshSelection();
+	handleVertexSelection();
+	handleMouseRotation();
 	updateViewMatrix();
 }

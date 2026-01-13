@@ -26,7 +26,7 @@ extern ProjectionConfig projectionConfig;
 // Movement configurations
 struct MovementConfig {
 	float speed = 1.0f;
-	float sensitivity = 0.01f;
+	float sensitivity = 0.005f;
 };
 extern MovementConfig movementConfig;
 
@@ -47,5 +47,8 @@ struct RenderConfig {
 
 	bool drawDepthMap = false;
 	bool depthHasBeenToggled = false;
+
+	bool editMode = false;
+	bool editModeHasBeenToggled = false;
 };
 extern RenderConfig renderConfig;

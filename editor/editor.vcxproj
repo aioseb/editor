@@ -134,6 +134,7 @@
     <ClCompile Include="camera_controller.cpp" />
     <ClCompile Include="config.cpp" />
     <ClCompile Include="editor.cpp" />
+    <ClCompile Include="hud.cpp" />
     <ClCompile Include="input_controller.cpp" />
     <ClCompile Include="matrices.cpp" />
     <ClCompile Include="mesh.cpp" />
@@ -146,6 +147,7 @@
   <ItemGroup>
     <ClInclude Include="camera_controller.h" />
     <ClInclude Include="config.h" />
+    <ClInclude Include="hud.h" />
     <ClInclude Include="input_controller.h" />
     <ClInclude Include="matrices.h" />
     <ClInclude Include="mesh.h" />

@@ -79,13 +79,13 @@ int main() {
 	// Create cube mesh
 	Mesh cubeOne = createMesh(verticesCube, 8, facesCube, 12);
 	setColor(cubeOne, BLUE);
-	int cubeOneIndex = addMesh(scene, cubeOne);
+	int cubeOneIndex = addMesh(cubeOne);
 
 	// Scale second cube along the X and Y axis
 	Mesh cubeTwo = createMesh(verticesCube, 8, facesCube, 12, worldRight * RADIUS, zeroVector, (worldRight + worldUp) * SCALE + worldForward);
 	setColor(cubeTwo, RED);
 	setTranslation(cubeTwo, worldForward * -4.0f);
-	int cubeTwoIndex = addMesh(scene, cubeTwo);
+	int cubeTwoIndex = addMesh(cubeTwo);
 
 	// Create third cube
 	Mesh cubeThree = createMesh(verticesCube, 8, facesCube, 12);
@@ -93,7 +93,7 @@ int main() {
 	setTranslation(cubeThree, worldForward * -5.0f);
 	setRotation(cubeThree, { -PI / 6, PI / 3, 0.0f });
 	setColor(cubeThree, GREEN);
-	int cubeThreeIndex = addMesh(scene, cubeThree);
+	int cubeThreeIndex = addMesh(cubeThree);
 
 	// Creade pyramid mesh
 	Mesh pyramid = createMesh(verticesPyramid, 5, facesPyramid, 6);
@@ -104,17 +104,6 @@ int main() {
 	setTranslation(triangle, worldRight * 4.0f);
 
 	sf::Clock clock;
-	
-	float x = 0;
-
-	Vec3 origin;
-	Vec3 dir;
-
-	Vec4 horigin;
-	Vec4 hdir;
-
-	Vec4 lineStart = { 2.0f, 1.0f, 0.0f, 1.0f };
-	Vec4 lineEnd = { -4.0f, 0.0f, -4.0f, 1.0f };
 
 	while (screenConfig.window.isOpen()) {
 		timeState.deltaTime = clock.restart().asSeconds();
@@ -125,7 +114,8 @@ int main() {
 			}
 		}
 
-		clearColorBuffer(BLACK);
+		handleInputs();
+		clearColorBuffer({64, 64, 64});
 
 		// Draw triangle
 		// drawMesh(triangle);
@@ -133,37 +123,21 @@ int main() {
 		// Draw frist cube in 3D space and rotate it
 		// drawMesh(cubeOne);
 		Vec3 rotationOne = { PI / 3, PI / 6, PI / 4 };
-		rotateBy(*getMesh(scene, cubeOneIndex), rotationOne* DELTA* timeState.deltaTime);
+		rotateBy(*getMesh(cubeOneIndex), rotationOne* DELTA* timeState.deltaTime);
 		// rotateBy(cubeOne, worldUp * DELTA * timeState.deltaTime);
+
+		// translateSelectedBy({ 0.1f, 0.0f, 0.0f });
 
 		// Draw second cube in 3D space and move it in circular motion
 		// drawMesh(cubeTwo);
 
-		drawScene(scene);
-
-		if (mouseState.mouseClicked) {
-			pickMeshAt(scene, mouseState.x, mouseState.y);
-			screenToWorldRay(scene, mouseState.x, mouseState.y, origin, dir);
-			horigin = { origin.x, origin.y, origin.z, 1.0f };
-			hdir = { dir.x, dir.y, dir.z, 0.0f };
-
-			lineStart = horigin;
-			lineEnd = horigin + hdir * 60.0f;
-		}
-		
+		drawScene();
 		// Draw world axis in the center of the screen
 		if (renderConfig.drawAxisEnabled) {
 			drawAxis();
 		}
 
-		// Act upon mouse or keyboard press
-		handleInputs();
-
-		angle += DELTA * timeState.deltaTime;
-		if (angle > PI * 2) angle = 0.0f;
-
-		drawLineWorldSpace(lineStart, lineEnd);
-
+		drawScene();
 		render();
 	}
 }
