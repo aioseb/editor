@@ -19,3 +19,4 @@ constexpr Color BLUE = { 0, 0, 255, 255 };
 
 Color randomColor();
 float linearizeDepth(float depth);
+void printInstructions();

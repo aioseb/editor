@@ -4,10 +4,11 @@
 // the model get updated, followed by the view.
 //
 // NOTE:
-// We are not referring to the matrices in the MVP!!
 // This is an attempt to follow the MVC architecture.
 
 #include "render_controller.h"
+
+float viewHeightRatio = 0.8;
 
 void updateProjectionMatrix() {
 	float W = screenConfig.width;
@@ -19,12 +20,21 @@ void updateProjectionMatrix() {
 }
 
 // TODO: Find a way to resize the software rasterizer window
+//Done
+void initializeWindow() {
+	int width = screenConfig.width;
+	int height = screenConfig.height;
+
+	renderState.viewportMatrix = viewportMatrix(0, 0, width, height, 0, 1);
+	screenConfig.window.create(sf::VideoMode(sf::Vector2u(width, height)), "Editor 3D");
+}
 void updateWindow() {
 	int width = screenConfig.width;
 	int height = screenConfig.height;
 
-	renderState.viewportMatrix = viewportMatrix(0.0f, 0.0f, width, height, 0.0f, 1.0f);
-	screenConfig.window.create(sf::VideoMode(sf::Vector2u(width, height)), "Test");
+	renderState.viewportMatrix = viewportMatrix(0, 0, width, height, 0, 1);
+	sf::FloatRect visibleArea(sf::Vector2f(0, 0), sf::Vector2f(width, height / viewHeightRatio));
+	screenConfig.window.setView(sf::View(visibleArea));
 }
 
 // Updates view matrix based on current camera state
@@ -95,6 +105,13 @@ Mat4 calculateMVP(const Mat4& modelMatrix) {
 }
 
 void initializeRenderState() {
+	updateProjectionMatrix();
+	initializeWindow();
+	updateViewMatrix();
+	updateColorBufferSize();
+}
+
+void updateRenderState() {
 	updateProjectionMatrix();
 	updateWindow();
 	updateViewMatrix();

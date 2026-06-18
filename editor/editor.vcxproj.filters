@@ -48,7 +48,7 @@
     <ClCompile Include="scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="hud.cpp">
+    <ClCompile Include="number_reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,7 +86,7 @@
     <ClInclude Include="scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="hud.h">
+    <ClInclude Include="number_reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

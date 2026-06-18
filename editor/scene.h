@@ -47,3 +47,7 @@ bool rayIntersectTriangle(const Vec3& ro, const Vec3& rd,
 int pickMeshAt(int mouseX, int mouseY);
 int pickVertexAt(int mouseX, int mouseY);
 void genSelectedVertexNeighbours();
+void changeColorSelected(Color color);
+void createMeshInScene(const char* filePath);
+void deleteSelected();
+

@@ -5,13 +5,12 @@
 // but without using any OpenGL libraries.
 // 
 // This file is for educational purposes. 
-// Expect many bugs and questionable decisions :)
 // 
 // Conventions inspired from OpenGL include:
 // - Column-major matrix layout
 // - Post multiplication of column vectors (v' = M * v)
 // - Right-handed system (-Z is the forward vector
-// - Visible points are in NDC in the range [-1, 1]
+// - Visible points are in NDC in the range of [-1, 1]
 // 
 // Resources used:
 // https://www.songho.ca/opengl/index.html

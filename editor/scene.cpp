@@ -20,14 +20,29 @@ void drawScene() {
 	for (int meshIndex = 0; meshIndex < scene.meshCount; ++meshIndex) {
 		drawMesh(scene.meshes[meshIndex]);
 		if (meshIndex == scene.selectedIndex) {
-			drawMesh(scene.meshes[meshIndex], true, {255, 255, 0});
+			drawMesh(scene.meshes[meshIndex], true, { 255, 255, 0 });
 		}
 		else {
 			drawMesh(scene.meshes[meshIndex]);
 		}
 	}
-
 	drawSelectedVertex();
+
+	// Draw a green border if in edit mode
+	if (renderConfig.editMode) {
+		int x0 = 0, y0 = 0;
+		int x1 = screenConfig.width, y1 = screenConfig.height;
+
+		const Color LIME = { 77, 255, 77 };
+		for (int k = 0; k < 6; k++) {
+			drawLine(x0, y0, x1, y0, LIME);
+			drawLine(x0, y0, x0, y1, LIME);
+			drawLine(x1, y1, x1, y0, LIME);
+			drawLine(x1, y1, x0, y1, LIME);
+
+			++x0, ++y0, --x1, --y1;
+		}
+	}
 }
 
 // Draws selected vertex
@@ -440,4 +455,35 @@ void genSelectedVertexNeighbours() {
 			}
 		}
 	}
+}
+
+void changeColorSelected(Color color) {
+	Mesh* mesh = selected();
+	if (mesh == nullptr) return;
+	setColor(*mesh, color);
+}
+
+void createMeshInScene(const char* filePath) {
+	Mesh mesh = createMesh(filePath);
+	const float SPAWN_DISTANCE = 4.0f;
+
+	const Mat4& view = renderState.viewMatrix;
+	Vec3 forward = { -view.m[2][0], -view.m[2][1], -view.m[2][2] };
+	forward = normalize(forward);
+	Vec3 spawnPos = cameraState.camPosition + forward * SPAWN_DISTANCE;
+	setTranslation(mesh, spawnPos);
+
+	addMesh(mesh);
+}
+
+void deleteSelected() {
+	int idx = scene.selectedIndex;
+	if (idx == -1) return;
+
+	int count = scene.meshCount;
+
+	std::swap(scene.meshes[count - 1], scene.meshes[idx]);
+	--scene.meshCount;
+	scene.selectedIndex = -1;
+	scene.selectedVertexIndex = -1;
 }

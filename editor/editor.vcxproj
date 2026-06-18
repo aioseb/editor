@@ -111,6 +111,10 @@
       <AdditionalLibraryDirectories>C:\Users\Workspace\source\repos\editor\editor\SFML-3.0.2\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-graphics.lib;sfml-window.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -129,15 +133,19 @@
       <AdditionalLibraryDirectories>C:\Users\Workspace\source\repos\editor\editor\SFML-3.0.2\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-graphics.lib;sfml-window.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="camera_controller.cpp" />
     <ClCompile Include="config.cpp" />
     <ClCompile Include="editor.cpp" />
-    <ClCompile Include="hud.cpp" />
     <ClCompile Include="input_controller.cpp" />
     <ClCompile Include="matrices.cpp" />
     <ClCompile Include="mesh.cpp" />
+    <ClCompile Include="number_reader.cpp" />
     <ClCompile Include="render_controller.cpp" />
     <ClCompile Include="render_view.cpp" />
     <ClCompile Include="scene.cpp" />
@@ -147,10 +155,10 @@
   <ItemGroup>
     <ClInclude Include="camera_controller.h" />
     <ClInclude Include="config.h" />
-    <ClInclude Include="hud.h" />
     <ClInclude Include="input_controller.h" />
     <ClInclude Include="matrices.h" />
     <ClInclude Include="mesh.h" />
+    <ClInclude Include="number_reader.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="render_controller.h" />
     <ClInclude Include="render_view.h" />

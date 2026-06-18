@@ -11,6 +11,8 @@ struct RenderState {
 	uint8_t* colorBuffer;
 	float* depthBuffer;
 	sf::Texture texture;
+
+	int editTransform = 0;	// 0 - translate; 1 - rotate; 2 - scale; 3 - vertex movement
 };
 extern RenderState renderState;
 
